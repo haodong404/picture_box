@@ -1,0 +1,31 @@
+{
+  "storage": "local",
+  "local": {
+    "dir": "./.gen"
+  },
+  "base_url": "http://localhost:8080",
+  "partitions": {
+    "default": {
+      "enable": true,
+      "original": "origin",
+      "lossy": true,
+      "quality": 80.0,
+      "resolves": {
+        "xs": {
+          "width": 50,
+          "height": 50,
+          "lossy": false
+        },
+        "s": {
+          "width": 200,
+          "height": 200,
+          "quality": 50
+        },
+        "m": {
+          "width": 400,
+          "height": 400
+        }
+      }
+    }
+  }
+}
