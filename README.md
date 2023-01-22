@@ -1,5 +1,7 @@
 # Picture box
 
+[![Release](https://github.com/zacharychin233/picture_box/actions/workflows/release.yml/badge.svg?branch=master)](https://github.com/zacharychin233/picture_box/actions/workflows/release.yml)
+
 #### A ***simple***, ***fast*** and ***easy*** web server for processing and storing images.
 
 ### 1. How to use
