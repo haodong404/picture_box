@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::string::ToString;
 use std::sync::{Arc, Mutex};
 use actix_web::http::StatusCode;
 use actix_web::{HttpResponse, HttpResponseBuilder};
@@ -10,6 +11,14 @@ use serde::{Deserialize, Serialize};
 use webp::WebPMemory;
 use crate::storage::Storage;
 
+fn default_hostname() -> String {
+    "127.0.0.1".to_string()
+}
+
+fn default_port() -> u16 {
+    8080
+}
+
 /// To process an image.
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -17,12 +26,23 @@ pub struct Args {
     /// The path of configuration, a JSON file
     #[arg(short, long)]
     pub config: String,
+
+    /// Bind a hostname.
+    #[arg(short, long)]
+    pub bind: Option<String>,
+
+    /// Server port.
+    #[arg(short, long)]
+    pub port: Option<u16>,
+
 }
 
 impl Clone for Args {
     fn clone(&self) -> Self {
         Args {
-            config: self.config.clone()
+            config: self.config.clone(),
+            bind: self.bind.clone(),
+            port: self.port.clone(),
         }
     }
 
@@ -54,6 +74,11 @@ pub struct Config {
     pub storage: String,
     pub local: Option<LocalConfig>,
 
+    #[serde(default = "default_hostname")]
+    pub bind: String,
+
+    #[serde(default = "default_port")]
+    pub port: u16,
     #[serde(default = "default_base_url")]
     pub base_url: String,
 

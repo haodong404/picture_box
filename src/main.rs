@@ -7,6 +7,7 @@ use actix_web::{App, HttpServer, middleware::Logger, web};
 use actix_web::web::Data;
 use clap::Parser;
 use env_logger::Env;
+use log::info;
 use picture_box::models::{Args, Config, Context};
 use picture_box::services::{delete_picture, get_picture, list_pictures, upload_picture};
 use picture_box::storage::{Cos, Local, Storage};
@@ -19,6 +20,12 @@ async fn main() -> Result<()> {
     let config: Config = serde_json::from_reader(BufReader::new(config_file)).expect("The configuration file must be in JSON format.");
     let config = Box::new(config);
     let config = Box::leak(config);
+    if let Some(bind) = args.bind {
+        config.bind = bind;
+    }
+    if let Some(port) = args.port {
+        config.port = port;
+    }
     let storage: Box<Mutex<dyn Storage + Send + Sync>> =
         match config.storage.as_ref() {
             "local" => {
@@ -36,6 +43,7 @@ async fn main() -> Result<()> {
         config,
         storage,
     });
+    info!("Bind: {}:{}", config.bind.as_str(), config.port);
     HttpServer::new(move || {
         let context = Arc::clone(&context);
         App::new()
@@ -49,7 +57,7 @@ async fn main() -> Result<()> {
                     .service(list_pictures)
             )
     })
-        .bind(("127.0.0.1", 8080))?
+        .bind((config.bind.as_str(), config.port))?
         .run()
         .await
 }
