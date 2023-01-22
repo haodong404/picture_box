@@ -7,9 +7,9 @@ use actix_web::{App, HttpServer, middleware::Logger, web};
 use actix_web::web::Data;
 use clap::Parser;
 use env_logger::Env;
-use picture_processor::models::{Args, Config, Context};
-use picture_processor::services::{delete_picture, get_picture, list_pictures, upload_picture};
-use picture_processor::storage::{Cos, Local, Storage};
+use picture_box::models::{Args, Config, Context};
+use picture_box::services::{delete_picture, get_picture, list_pictures, upload_picture};
+use picture_box::storage::{Cos, Local, Storage};
 
 #[actix_web::main]
 async fn main() -> Result<()> {
