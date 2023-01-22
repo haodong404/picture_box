@@ -3,7 +3,7 @@ use std::error::Error;
 use std::path::PathBuf;
 use std::convert::From;
 use std::fs;
-use std::fs::{File, read_dir};
+use std::fs::{create_dir_all, File, read_dir};
 use std::io::{BufReader, BufWriter, Read, Write};
 use log::info;
 use crate::models::{Config, ImageFormat, LocalConfig, Output, PageList, Pagination, TargetFile};
@@ -13,7 +13,6 @@ use crate::models::{Config, ImageFormat, LocalConfig, Output, PageList, Paginati
 type Pictures = HashMap<String, String>;
 
 pub trait Storage {
-
     /// Store the compressed output to a storage, an error will be returned if it fails.
     fn store(&mut self, output: Output) -> Result<Pictures, Box<dyn Error>>;
 
@@ -49,6 +48,9 @@ impl Local {
         // Recounting when the app is restarted.
         for key in config.partitions.keys() {
             root_dir.push(key);
+            if !root_dir.exists() {
+                create_dir_all(&root_dir).unwrap();
+            }
             let reader = read_dir(&root_dir).unwrap();
             count.insert(key.to_string(), reader.count());
             root_dir.pop();
@@ -122,7 +124,7 @@ impl Storage for Local {
         let mut pics = HashMap::new();
         root_dir.push(&output.partition);
         root_dir.push(&output.hash);
-        fs::create_dir_all(&root_dir)?;
+        create_dir_all(&root_dir)?;
         for target in output.targets {
             info!("WRITING: [{}]", target.resolve);
             match target.file {
