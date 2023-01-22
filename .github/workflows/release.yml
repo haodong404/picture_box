@@ -4,7 +4,10 @@ permissions:
   # TODO: once `releases: write` is supported, use it instead.
   contents: write
 
-on: [push]
+on:
+  push:
+    tags:
+      - v[0-9]+.*
 
 env:
   CARGO_INCREMENTAL: 0
@@ -31,8 +34,9 @@ jobs:
         run: rustup update stable --no-self-update
       - uses: taiki-e/create-gh-release-action@v1
         with:
+          changelog: CHANGELOG.md
           title: $version
-          branch: ci-debug
+          branch: master
           token: ${{ secrets.GITHUB_TOKEN }}
   upload-assets:
     name: ${{ matrix.target }}
