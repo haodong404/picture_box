@@ -1,18 +1,34 @@
-# Picture box
+# Picture ox
 
 [![Release](https://github.com/zacharychin233/picture_box/actions/workflows/release.yml/badge.svg?branch=master)](https://github.com/zacharychin233/picture_box/actions/workflows/release.yml)
 
 #### A ***simple***, ***fast*** and ***easy*** web server for processing and storing images.
 
-### 1. How to use
+When you upload an image file, the application will process it according to your configuration. It only supports
+converting some image formats to webp files.
+
+#### Supported image format:
+
+* PNG
+* JPEG
+* GIF
+* TIFF
+* WebP
+* AVIF
+
+## How to use
 
 1. Download the binary file.
 2. Provide a config file.
 3. `picture_box -c config.json`
 
-### 2. Configure
+## Configure
 
 The json structure as follows:
+
+## API
+
+All the following apis are **prefixed with** `/api/picture`.
 
 ```typescript
 interface Local {
@@ -52,6 +68,10 @@ interface Partition {
 }
 
 interface Config {
+    // Bind hostname
+    bind: String,
+    // Port
+    port: number,
     // Where you wanna store.
     storage: string,
     // local config.
