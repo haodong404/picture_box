@@ -1,6 +1,6 @@
 # Picture ox
 
-[![Release](https://github.com/zacharychin233/picture_box/actions/workflows/release.yml/badge.svg?branch=master)](https://github.com/zacharychin233/picture_box/actions/workflows/release.yml)
+[![Test](https://github.com/zacharychin233/picture_box/actions/workflows/ci.yml/badge.svg)](https://github.com/zacharychin233/picture_box/actions/workflows/ci.yml)
 
 #### A ***simple***, ***fast*** and ***easy*** web server for processing and storing images.
 
@@ -69,9 +69,9 @@ interface Partition {
 
 interface Config {
     // Bind hostname
-    bind: String,
+    bind: String | undefined, // Default: 8080
     // Port
-    port: number,
+    port: number | undefined, // Default: localhost
     // Where you wanna store.
     storage: string,
     // local config.

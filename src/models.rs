@@ -12,7 +12,7 @@ use webp::WebPMemory;
 use crate::storage::Storage;
 
 fn default_hostname() -> String {
-    "127.0.0.1".to_string()
+    "localhost".to_string()
 }
 
 fn default_port() -> u16 {
