@@ -4,10 +4,9 @@
 
 #### A ***simple***, ***fast*** and ***easy*** web server for processing and storing images.
 
-When you upload an image file, the application will process it according to your configuration. It only supports
-converting some image formats to webp files.
+When you upload an image file, the application will process it according to your configuration. It only supports converting some specific images formats to webp files.
 
-#### Supported image format:
+##### Supported image format:
 
 * PNG
 * JPEG
@@ -18,17 +17,28 @@ converting some image formats to webp files.
 
 ## How to use
 
-1. Download the binary file.
-2. Provide a config file.
-3. `picture_box -c config.json`
+1. [Download](https://github.com/zacharychin233/picture_box/releases) the release file.
 
-## Configure
+2. Extract and move it to a new directory, a bunch of files may be generated here.
 
-The json structure as follows:
+3. Write a config file.
+
+4. And start `picture_box -c config.json`
 
 ## API
 
 All the following apis are **prefixed with** `/api/picture`.
+
+| URL                        | Method | Note                            | Example              |
+| -------------------------- | ------ | ------------------------------- | -------------------- |
+| `/:partition/upload`       | POST   | Upload an image file.           | /default/upload      |
+| `/:partition/:resolve/:id` | GET    | Find an image file.             | /default/xs/hashcode |
+| `/:partition/:id`          | DELETE | Delete all images in a resolve. | /default/hashcode    |
+| `/:partition/list`         | GET    | List all images in a partition  | /default/list        |
+
+## Configure
+
+The json structure as follows:
 
 ```typescript
 interface Local {
@@ -83,3 +93,7 @@ interface Config {
     partitions: Record<string, Partition>
 }
 ```
+
+## License
+
+[MIT](https://github.com/zacharychin233/codroid-textmate/blob/master/LICENSE)
