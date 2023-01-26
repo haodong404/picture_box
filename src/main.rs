@@ -1,7 +1,7 @@
 extern crate core;
 
 use actix_web::web::Data;
-use actix_web::{middleware::Logger, web, App, HttpServer};
+use actix_web::{middleware::Logger, web, App, HttpServer, HttpResponse};
 use clap::Parser;
 use env_logger::Env;
 use log::info;
@@ -12,6 +12,7 @@ use std::fs::File;
 use std::io::{BufReader, Result};
 use std::sync::{Arc, Mutex};
 use actix_embed::Embed;
+use actix_web::http::header::CONTENT_TYPE;
 use rust_embed::RustEmbed;
 
 #[derive(RustEmbed)]
@@ -57,7 +58,6 @@ async fn main() -> Result<()> {
         App::new()
             .app_data(Data::from(context))
             .wrap(Logger::default())
-            .service(Embed::new("/frontend", &Assets))
             .service(
                 web::scope("/api/pictures")
                     .service(upload_picture)
@@ -65,6 +65,17 @@ async fn main() -> Result<()> {
                     .service(delete_picture)
                     .service(list_pictures)
                     .service(list_partitions),
+            )
+            .service(
+                Embed::new("/{tail:.*}", &Assets)
+                    .index_file("index.html")
+                    .fallback_handler(|_: &_| -> HttpResponse {
+                        let index = Assets::get("index.html").unwrap();
+                        let index_data = index.data.into_owned();
+                        HttpResponse::Ok()
+                            .append_header((CONTENT_TYPE, "text/html"))
+                            .body(index_data)
+                    }),
             )
     })
         .bind((config.bind.as_str(), config.port))?
