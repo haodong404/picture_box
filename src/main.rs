@@ -6,7 +6,7 @@ use clap::Parser;
 use env_logger::Env;
 use log::info;
 use picture_box::models::{Args, Config, Context};
-use picture_box::services::{delete_picture, get_picture, list_pictures, upload_picture};
+use picture_box::services::{delete_picture, get_picture, list_pictures, upload_picture, list_partitions};
 use picture_box::storage::{Cos, Local, Storage};
 use std::fs::File;
 use std::io::{BufReader, Result};
@@ -57,13 +57,14 @@ async fn main() -> Result<()> {
         App::new()
             .app_data(Data::from(context))
             .wrap(Logger::default())
-            .service(Embed::new("/", &Assets))
+            .service(Embed::new("/frontend", &Assets))
             .service(
                 web::scope("/api/pictures")
                     .service(upload_picture)
                     .service(get_picture)
                     .service(delete_picture)
-                    .service(list_pictures),
+                    .service(list_pictures)
+                    .service(list_partitions),
             )
     })
         .bind((config.bind.as_str(), config.port))?

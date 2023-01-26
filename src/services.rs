@@ -5,8 +5,7 @@ use crate::models::{
 };
 use actix_multipart::Multipart;
 use actix_web::http::header::{CONTENT_LENGTH, CONTENT_TYPE};
-use actix_web::{delete, get, post, route, web, HttpResponse, Responder};
-use actix_web_rust_embed_responder::{EmbedResponse, IntoResponse};
+use actix_web::{delete, get, post, web, HttpResponse};
 use bytes::{BufMut, BytesMut};
 use futures_util::stream::StreamExt as _;
 use imageinfo::ImageInfo;
@@ -198,4 +197,12 @@ pub async fn list_pictures(
         Ok(result) => response_ok_data(result),
         Err(e) => response_ok_message(&e.to_string()),
     }
+}
+
+
+/// List all partitions
+#[get("/partitions")]
+pub async fn list_partitions(data: web::Data<Context>) -> HttpResponse {
+    let result: Vec<&String> = data.config.partitions.keys().collect();
+    response_ok_data(result)
 }
