@@ -1,4 +1,4 @@
-# Picture ox
+# Picture Box
 
 [![Test](https://github.com/zacharychin233/picture_box/actions/workflows/ci.yml/badge.svg)](https://github.com/zacharychin233/picture_box/actions/workflows/ci.yml)
 

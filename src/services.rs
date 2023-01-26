@@ -1,12 +1,16 @@
+use crate::compress;
+use crate::models::{
+    response_err, response_err_400, response_err_400_message, response_err_404_empty,
+    response_err_500, response_ok_data, response_ok_message, Context, ListQueryParams, UploadInfo,
+};
 use actix_multipart::Multipart;
-use actix_web::{delete, get, HttpResponse, post, web};
 use actix_web::http::header::{CONTENT_LENGTH, CONTENT_TYPE};
+use actix_web::{delete, get, post, route, web, HttpResponse, Responder};
+use actix_web_rust_embed_responder::{EmbedResponse, IntoResponse};
 use bytes::{BufMut, BytesMut};
 use futures_util::stream::StreamExt as _;
 use imageinfo::ImageInfo;
 use log::error;
-use crate::compress;
-use crate::models::{Context, ListQueryParams, response_err, response_err_400, response_err_400_message, response_err_404_empty, response_err_500, response_ok_data, response_ok_message, UploadInfo};
 
 /// Upload a image file to the server, a partition in the config file is required.
 /// The format of a request body is multipart/form-data, There are 3 items as follows:
@@ -14,7 +18,11 @@ use crate::models::{Context, ListQueryParams, response_err, response_err_400, re
 ///     `name: String`  **(Optional):**    The file name, it can be empty;
 ///     `hash: String`  **(Optional):**    The file hash, the server will hash the image if it's null;
 #[post("/{partition}/upload")]
-pub async fn upload_picture(path: web::Path<(String, )>, mut payload: Multipart, data: web::Data<Context>) -> HttpResponse {
+pub async fn upload_picture(
+    path: web::Path<(String,)>,
+    mut payload: Multipart,
+    data: web::Data<Context>,
+) -> HttpResponse {
     let mut file_bytes = BytesMut::with_capacity(10 * 1024 * 1024);
     let mut name_bytes = BytesMut::new();
     let mut hash_bytes = BytesMut::new();
@@ -111,7 +119,10 @@ pub async fn upload_picture(path: web::Path<(String, )>, mut payload: Multipart,
 
 /// Find a picture.
 #[get("/{partition}/{resolve}/{id}")]
-pub async fn get_picture(path: web::Path<(String, String, String)>, data: web::Data<Context>) -> HttpResponse {
+pub async fn get_picture(
+    path: web::Path<(String, String, String)>,
+    data: web::Data<Context>,
+) -> HttpResponse {
     let (partition_str, resolve, id) = path.into_inner();
     let data = data.into_inner();
     let config = data.config;
@@ -142,7 +153,10 @@ pub async fn get_picture(path: web::Path<(String, String, String)>, data: web::D
 
 /// Delete a picture.
 #[delete("/{partition}/{id}")]
-pub async fn delete_picture(path: web::Path<(String, String)>, data: web::Data<Context>) -> HttpResponse {
+pub async fn delete_picture(
+    path: web::Path<(String, String)>,
+    data: web::Data<Context>,
+) -> HttpResponse {
     let (partition_str, id) = path.into_inner();
     let data = data.into_inner();
     let config = data.config;
@@ -166,8 +180,12 @@ pub async fn delete_picture(path: web::Path<(String, String)>, data: web::Data<C
 ///     `current: usize`     **(Required):**   The current page, start from 1.
 ///     `page_size: usize`   **(Required):**   How many items you need at a time.
 #[get("/{partition}/list")]
-pub async fn list_pictures(path: web::Path<(String, )>, params: web::Query<ListQueryParams>, data: web::Data<Context>) -> HttpResponse {
-    let (partition_str, ) = path.into_inner();
+pub async fn list_pictures(
+    path: web::Path<(String,)>,
+    params: web::Query<ListQueryParams>,
+    data: web::Data<Context>,
+) -> HttpResponse {
+    let (partition_str,) = path.into_inner();
     if !data.config.partitions.contains_key(partition_str.as_str()) {
         return response_err(&format!("Partition {} not found", &partition_str), 404, 404);
     }
@@ -178,6 +196,6 @@ pub async fn list_pictures(path: web::Path<(String, )>, params: web::Query<ListQ
     let storage = storage.unwrap();
     match storage.list(params.current, params.page_size, &partition_str) {
         Ok(result) => response_ok_data(result),
-        Err(e) => response_ok_message(&e.to_string())
+        Err(e) => response_ok_message(&e.to_string()),
     }
 }
