@@ -19,7 +19,7 @@ export default function Header() {
         >
           Picture Box
         </A>
-        <span class="font-mono text-gray-400">{APP_VERSION}</span>
+        <span class="font-mono text-gray-400">{CORE_VERSION}</span>
       </div>
       <div class="absolute right-0 h-full flex items-center pr-4 gap-2">
         <select
