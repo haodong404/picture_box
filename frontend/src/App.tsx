@@ -6,6 +6,7 @@ const App: Component = () => {
   return (
     <Routes>
       <Route path="/partitions/:partition" component={Main} />
+      <Route path="/partitions" component={Main} />
     </Routes>
   );
 };

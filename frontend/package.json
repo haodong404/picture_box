@@ -18,6 +18,8 @@
   "dependencies": {
     "@ltd/j-toml": "^1.38.0",
     "@solidjs/router": "^0.7.0",
-    "solid-js": "^1.6.9"
+    "axios": "^1.2.5",
+    "solid-js": "^1.6.9",
+    "viewerjs": "^1.11.2"
   }
 }
