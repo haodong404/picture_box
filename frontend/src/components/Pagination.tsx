@@ -1,6 +1,4 @@
-import { A } from "@solidjs/router";
 import { createEffect, createSignal, For, Suspense } from "solid-js";
-import Loading from "./Loading";
 
 export default function Pagination(props: any) {
   let pageCount = 0;
@@ -9,11 +7,15 @@ export default function Pagination(props: any) {
   let right = 0;
   let afterOffset = 0;
   const [pageArray, setPageArray] = createSignal<Array<number>>();
-
+  let total = 0;
+  let page_size = 0;
+  let current = 0;
   createEffect(() => {
-    let total: number = props.pagination?.total | 0;
-    let page_size: number = props.pagination?.page_size | 0;
-    let current = props.pagination?.current | 0;
+    total = props.pagination?.total | 0;
+    page_size = props.pagination?.page_size | 0;
+    current = props.pagination?.current | 0;
+    console.log(current);
+
     pageCount = Math.ceil(total / page_size);
     beforeOffset = current - 5;
 
@@ -43,16 +45,16 @@ export default function Pagination(props: any) {
           <svg
             xmlns="http://www.w3.org/2000/svg"
             onClick={() => {
-              if (props.pagination?.current <= 1) {
+              if (current <= 1) {
                 return;
               }
               props.pageSetter("current", (p) => p - 1);
             }}
             width="1em"
             classList={{
-              "fill-gray-200": props.pagination?.current <= 1,
-              "hover:fill-blue-500": props.pagination?.current > 1,
-              "fill-gray-600": props.pagination?.current > 1,
+              "fill-gray-200": current <= 1,
+              "hover:fill-blue-500": current > 1,
+              "fill-gray-600": current > 1,
             }}
             class="cursor-pointer transition"
             height="1em"
@@ -70,9 +72,9 @@ export default function Pagination(props: any) {
                 }}
                 class="cursor-pointer transition"
                 classList={{
-                  "text-blue-500": item === props.pagination?.current,
+                  "text-blue-500": item === current,
                   "text-gray-600 hover:text-blue-500":
-                    item !== props.pagination?.current,
+                    item !== current,
                 }}
               >
                 {item}
@@ -86,16 +88,16 @@ export default function Pagination(props: any) {
             width="1em"
             height="1em"
             onClick={() => {
-              if (props.pagination?.current >= pageCount) {
+              if (current >= pageCount) {
                 return;
               }
               props.pageSetter("current", (p) => p + 1);
             }}
             class="cursor-pointer transition-all"
             classList={{
-              "fill-gray-200": props.pagination?.current >= pageCount,
-              "hover:fill-blue-500": props.pagination?.current < pageCount,
-              "fill-gray-600": props.pagination?.current < pageCount,
+              "fill-gray-200": current >= pageCount,
+              "hover:fill-blue-500": current < pageCount,
+              "fill-gray-600": current < pageCount,
             }}
             viewBox="0 0 24 24"
           >
