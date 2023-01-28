@@ -25,20 +25,29 @@ When you upload an image file, the application will process it according to your
 
 4. And start `picture_box -c config.json`
 
+## Command
+
+- `--config, -c`;  **REQUIRED**;   A config file, JSON format.
+
+- `--bind, -b`;  Optional;  A hostname, it will override the 'bind' field in config file.
+
+- `--port, -p`;  Optional;  it will override 'port' config file.
+
 ## API
 
 All the following apis are **prefixed with** `/api/picture`.
 
-| URL                        | Method | Note                            | Example              |
-| -------------------------- | ------ | ------------------------------- | -------------------- |
-| `/:partition/upload`       | POST   | Upload an image file.           | /default/upload      |
-| `/:partition/:resolve/:id` | GET    | Find an image file.             | /default/xs/hashcode |
-| `/:partition/:id`          | DELETE | Delete all images in a resolve. | /default/hashcode    |
-| `/:partition/list`         | GET    | List all images in a partition  | /default/list        |
+| URL                        | Method | Note                                                   | Example              |
+| -------------------------- | ------ | ------------------------------------------------------ | -------------------- |
+| `/:partition/upload`       | POST   | Upload an image file.                                  | /default/upload      |
+| `/:partition/:resolve/:id` | GET    | Find an image file.                                    | /default/xs/hashcode |
+| `/:partition/:id`          | DELETE | Delete all images in a resolve.                        | /default/hashcode    |
+| `/:partition/list`         | GET    | List all images in a partition                         | /default/list        |
+| `/partitions`              | GET    | List all partitions, it depends on your configuration. |                      |
 
 ## Configure
 
-The json structure as follows:
+The json structure as follows ([Template](https://github.com/zacharychin233/picture_box/blob/master/resources/config.json)) :
 
 ```typescript
 interface Local {
@@ -64,8 +73,6 @@ interface Resolve {
 interface Partition {
     // Does it need to be compressed
     enable: boolean,
-    // The original file's tag name.
-    original: string | undefined, // Default: origin
     // Does it need lossy compression. It has a lower priority.
     // It would be overrided by Resolve.lossy.
     lossy: boolean
