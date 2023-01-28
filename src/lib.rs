@@ -17,6 +17,8 @@ pub mod storage;
 #[cfg(test)]
 mod tests;
 
+const ORIGIN_TEXT: &str = "origin";
+
 fn exec(file_bytes: Arc<Bytes>, image_format: ImageFormat, output: Sender<Target>, key: String, cfg: Resolve) -> Result<(), Box<dyn Error>> {
     info!("RESOLVING: [{key}]");
     let file_reader = Cursor::new(&*file_bytes);
@@ -52,14 +54,8 @@ pub fn compress(info: UploadInfo, config: &Partition) -> Result<Output, Box<dyn 
         targets: vec![],
     };
 
-    let original = config.original.as_ref();
-    let original: &str = if let Some(s) = original {
-        s
-    } else {
-        "original"
-    };
     output.targets.push(Target {
-        resolve: String::from(original),
+        resolve: String::from(ORIGIN_TEXT),
         file: TargetFile::Original(Arc::clone(&file_bytes)),
     });
     if !config.enable {

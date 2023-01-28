@@ -7,7 +7,6 @@
   "partitions": {
     "default": {
       "enable": true,
-      "original": "origin",
       "lossy": true,
       "quality": 80.0,
       "resolves": {

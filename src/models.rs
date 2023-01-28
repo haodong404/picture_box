@@ -93,7 +93,6 @@ pub struct LocalConfig {
 #[derive(Deserialize)]
 pub struct Partition {
     pub(crate) enable: bool,
-    pub(crate) original: Option<String>,
     pub(crate) lossy: Option<bool>,
     pub(crate) quality: Option<f32>,
     pub(crate) resolves: HashMap<String, Resolve>,
