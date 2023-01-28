@@ -210,11 +210,10 @@ impl Storage for Local {
     }
 
     fn list(&self, current: usize, page_size: usize, partition: &str) -> Result<PageList<Pictures>, Box<dyn Error>> {
-        let current = current - 1;
         let mut dir = self.root_dir.clone();
         dir.push(partition);
         let dir = read_dir(dir)?;
-        let n = current * page_size;
+        let n = (current - 1) * page_size;
         let mut skip = dir.skip(n);
         let mut list: Vec<Pictures> = vec![];
         for _ in 0..page_size {
