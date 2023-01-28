@@ -1,10 +1,13 @@
 use crate::compress;
 use crate::models::{
-    response_err, response_err_400, response_err_400_message, response_err_404_empty,
-    response_err_500, response_ok_data, response_ok_message, Context, ListQueryParams, UploadInfo,
+    response_err, response_err_400, response_err_400_message, response_err_403,
+    response_err_404_empty, response_err_500, response_ok_data, response_ok_message, Context,
+    ListQueryParams, PasswordHeader, UploadInfo,
 };
+use crate::utils::authorization;
 use actix_multipart::Multipart;
 use actix_web::http::header::{CONTENT_LENGTH, CONTENT_TYPE};
+use actix_web::web::Header;
 use actix_web::{delete, get, post, web, HttpResponse};
 use bytes::{BufMut, BytesMut};
 use futures_util::stream::StreamExt as _;
@@ -178,12 +181,18 @@ pub async fn delete_picture(
 /// List all pictures, there are 2 query parameters available:
 ///     `current: usize`     **(Required):**   The current page, start from 1.
 ///     `page_size: usize`   **(Required):**   How many items you need at a time.
+/// Headers:
+/// Password  **Required**
 #[get("/{partition}/list")]
 pub async fn list_pictures(
     path: web::Path<(String,)>,
     params: web::Query<ListQueryParams>,
     data: web::Data<Context>,
+    header: web::Header<PasswordHeader>,
 ) -> HttpResponse {
+    if let Err(_) = authorization(&header, data.config) {
+        return response_err_403();
+    }
     let (partition_str,) = path.into_inner();
     if !data.config.partitions.contains_key(partition_str.as_str()) {
         return response_err(&format!("Partition {} not found", &partition_str), 404, 404);
@@ -199,10 +208,17 @@ pub async fn list_pictures(
     }
 }
 
-
 /// List all partitions
+/// Headers:
+/// Password  **Required**
 #[get("/partitions")]
-pub async fn list_partitions(data: web::Data<Context>) -> HttpResponse {
+pub async fn list_partitions(
+    data: web::Data<Context>,
+    header: Header<PasswordHeader>,
+) -> HttpResponse {
+    if let Err(_) = authorization(&header, data.config) {
+        return response_err_403();
+    }
     let result: Vec<&String> = data.config.partitions.keys().collect();
     response_ok_data(result)
 }

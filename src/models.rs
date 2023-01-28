@@ -1,15 +1,19 @@
-use std::collections::HashMap;
-use std::string::ToString;
-use std::sync::{Arc, Mutex};
+use crate::storage::Storage;
+use actix_web::error::ParseError;
+use actix_web::http::header::{
+    ContentType, Header, HeaderName, HeaderValue, InvalidHeaderValue, TryIntoHeaderValue,
+    CONTENT_TYPE,
+};
 use actix_web::http::StatusCode;
 use actix_web::{HttpResponse, HttpResponseBuilder};
-use actix_web::http::header::{CONTENT_TYPE, ContentType};
 use bytes::Bytes;
 use clap::Parser;
 use imageinfo::ImageInfo;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use std::string::ToString;
+use std::sync::{Arc, Mutex};
 use webp::WebPMemory;
-use crate::storage::Storage;
 
 fn default_hostname() -> String {
     "localhost".to_string()
@@ -34,7 +38,6 @@ pub struct Args {
     /// Server port.
     #[arg(short, long)]
     pub port: Option<u16>,
-
 }
 
 impl Clone for Args {
@@ -81,6 +84,8 @@ pub struct Config {
     pub port: u16,
     #[serde(default = "default_base_url")]
     pub base_url: String,
+
+    pub password: Option<String>,
 
     pub partitions: HashMap<String, Partition>,
 }
@@ -178,7 +183,8 @@ impl TryFrom<ImageInfo> for ImageFormat {
     type Error = String;
 
     fn try_from(value: ImageInfo) -> Result<Self, Self::Error> {
-        let format = image::ImageFormat::from_mime_type(value.mimetype).ok_or("Unsupported format")?;
+        let format =
+            image::ImageFormat::from_mime_type(value.mimetype).ok_or("Unsupported format")?;
         Ok(ImageFormat {
             image_format: format,
             ext: value.ext.to_string(),
@@ -191,6 +197,39 @@ impl TryFrom<ImageInfo> for ImageFormat {
 pub struct ListQueryParams {
     pub current: usize,
     pub page_size: usize,
+}
+
+pub struct PasswordHeader {
+    pub password: String,
+}
+
+impl From<&str> for PasswordHeader {
+    fn from(pwd: &str) -> Self {
+        PasswordHeader {
+            password: pwd.to_string(),
+        }
+    }
+}
+
+impl TryIntoHeaderValue for PasswordHeader {
+    type Error = InvalidHeaderValue;
+
+    fn try_into_value(self) -> Result<actix_web::http::header::HeaderValue, Self::Error> {
+        HeaderValue::from_str(&self.password)
+    }
+}
+
+impl Header for PasswordHeader {
+    fn name() -> actix_web::http::header::HeaderName {
+        HeaderName::from_static("password")
+    }
+
+    fn parse<M: actix_web::HttpMessage>(msg: &M) -> Result<Self, actix_web::error::ParseError> {
+        let password = msg.headers().get("Password").ok_or(ParseError::Header)?;
+        Ok(PasswordHeader::from(
+            password.to_str().map_err(|_| ParseError::Header)?,
+        ))
+    }
 }
 
 fn extension2mime(extension: &str) -> Result<&str, &str> {
@@ -243,7 +282,16 @@ pub fn response_err_500(message: &str) -> HttpResponse {
     response_err(message, 500, 500)
 }
 
-pub fn response_ok<T: Serialize>(data: Option<T>, message: &str, code: u16, status: u16) -> HttpResponse {
+pub fn response_err_403() -> HttpResponse {
+    response_err("Authorization failed.", 403, 403)
+}
+
+pub fn response_ok<T: Serialize>(
+    data: Option<T>,
+    message: &str,
+    code: u16,
+    status: u16,
+) -> HttpResponse {
     let mut response = HttpResponse::Ok();
     response.append_header((CONTENT_TYPE, ContentType::json()));
     let status_code = StatusCode::from_u16(status);

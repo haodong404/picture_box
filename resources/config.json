@@ -4,6 +4,7 @@
     "dir": "./.gen"
   },
   "base_url": "http://localhost:8080",
+  "password": "12345",
   "partitions": {
     "default": {
       "enable": true,

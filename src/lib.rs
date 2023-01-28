@@ -13,6 +13,7 @@ use crate::models::{Output, Partition, Resolve, Target, TargetFile, UploadInfo, 
 pub mod models;
 pub mod services;
 pub mod storage;
+pub mod utils;
 
 #[cfg(test)]
 mod tests;
