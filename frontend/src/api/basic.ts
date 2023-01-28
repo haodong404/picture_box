@@ -1,5 +1,5 @@
 import axios from "axios";
-import { QueryParams } from "./models";
+import { Mocker, QueryParams } from "./models";
 
 const myAxios = axios.create({
   baseURL: "/api/pictures",
@@ -24,17 +24,27 @@ export function get<T>(path: string, query?: QueryParams): Promise<T> {
 }
 
 export function getOrMock<T>(
-  mock: T | undefined,
   path: string,
-  query?: QueryParams
-) {
-  if (import.meta.env.DEV && MOCK) {
-    if (mock) {
-      return Promise.resolve(mock);
+  query?: QueryParams,
+  mock?: Mocker<T>
+): Promise<T> {
+  return new Promise((resolve, reject) => {
+    if (import.meta.env.DEV && MOCK) {
+      setTimeout(() => {
+        if (mock) {
+          resolve(mock.data);
+        } else {
+          reject("Not found");
+        }
+      }, mock?.delay | 0);
     } else {
-      return Promise.reject("Not found");
+      get<T>(path, query)
+        .then((res) => {
+          resolve(res);
+        })
+        .catch((e) => {
+          reject(e);
+        });
     }
-  } else {
-    return get<T>(path, query);
-  }
+  });
 }

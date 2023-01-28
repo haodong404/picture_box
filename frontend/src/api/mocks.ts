@@ -10,25 +10,26 @@ const resolves: Resolve[] = [];
 
 const length = 54;
 for (let i = 0; i < length; i++) {
-  resolves.push({
-    middle: m,
-    origin: origin,
-    s: s,
-    xs: xs,
-  });
+  let json = `{"middle": "${m}", "origin": "${origin}", "s": "${s}", "${i}": "${xs}", "hello": "${xs}", "hel": "${xs}"}`;
+  let obj = JSON.parse(json);
+  resolves.push(obj);
 }
 
 export const listPicturesOk = (current: number): ListResponse<Resolve> => {
   let list: Resolve[] = [];
-  let end = current + 10;
+  let start = (current - 1) * 10;
+  let end = start + 10;
   resolves.forEach((value, index) => {
-    if (index >= current && index < end) {
+    if (index >= start && index < end) {
       list.push(value);
+    }
+    if (index > end) {
+      return;
     }
   });
 
   return {
-    list: resolves,
+    list: list,
     pagination: {
       current: current,
       page_size: 10,

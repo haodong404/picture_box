@@ -20,3 +20,8 @@ export interface ListResponse<T> {
   list: Array<T>;
   pagination: Pagination;
 }
+
+export interface Mocker<T> {
+  data?: T;
+  delay?: number;
+}

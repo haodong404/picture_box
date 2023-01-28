@@ -15,6 +15,7 @@ export default defineConfig({
       presets: [presetWind()],
     }),
   ],
+  
   define: {
     FRONTEND_VERSION: JSON.stringify(process.env.npm_package_version),
     CORE_VERSION: JSON.stringify(cargo_toml.package.version),

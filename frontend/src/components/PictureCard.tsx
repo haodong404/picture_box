@@ -47,7 +47,7 @@ export default function PictureCard(props: any) {
           alt="Origin"
         />
       </section>
-      <section class="p-4 flex gap-2 overflow-x-auto">
+      <section class="p-4 flex gap-2 flex-wrap">
         <For each={Object.entries(props.resolves)}>
           {([key, value], index) => (
             <ResolveItem resolve={key} url={value} index={index} />

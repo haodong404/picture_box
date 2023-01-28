@@ -9,6 +9,7 @@ import {
   untrack,
 } from "solid-js";
 import { getPartitions } from "../api/api";
+import Loading from "./Loading";
 import Placeholder from "./Placeholder";
 
 const PartitionSelector = () => {
@@ -75,7 +76,7 @@ export default function Header() {
       </div>
       <div class="absolute right-0 h-full flex items-center pr-4 gap-2">
         <ErrorBoundary fallback={(err) => <Placeholder text={err} />}>
-          <Suspense fallback={<Placeholder text="Loading..." />}>
+          <Suspense fallback={<Loading />}>
             <PartitionSelector />
           </Suspense>
         </ErrorBoundary>
