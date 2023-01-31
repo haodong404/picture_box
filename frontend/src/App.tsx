@@ -1,17 +1,28 @@
 import { Route, Routes } from "@solidjs/router";
-import type { Component } from "solid-js";
+import { Component, createSignal } from "solid-js";
+import Header from "./components/Header";
 import Login from "./view/Login";
 import Main from "./view/Main";
-import Menu from "./view/Menu";
+import Partitions from "./view/Partitions";
 
 const App: Component = () => {
+  const [headerHeight, setHeaderHeight] = createSignal(0.0);
   return (
-    <Routes>
-      <Route path="/partitions/:partition" component={Main} />
-      <Route path="/partitions" component={Main} />
-      <Route path="/" component={Login} />
-      <Route path="/menu" component={Menu} />
-    </Routes>
+    <>
+      <Header setHeaderHeight={setHeaderHeight} />
+      <main
+        class="absolute bottom-0 left-0 right-0 top-0"
+        style={{
+          top: `${headerHeight()}px`,
+        }}
+      >
+        <Routes>
+          <Route path="/" component={Login} />
+          <Route path="/partitions" component={Partitions} />
+          <Route path="/partitions/:partition" component={Main} />
+        </Routes>
+      </main>
+    </>
   );
 };
 

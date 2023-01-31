@@ -1,4 +1,5 @@
 import axios from "axios";
+import { refresh } from "../utils/useAuthorization";
 import { Mocker, QueryParams } from "./models";
 
 const myAxios = axios.create({
@@ -6,14 +7,24 @@ const myAxios = axios.create({
   timeout: 5000,
 });
 
-export function get<T>(path: string, query?: QueryParams): Promise<T> {
+export function get<T>(
+  path: string,
+  query?: QueryParams,
+  headers?: Record<string, string>
+): Promise<T> {
   return new Promise((resolve, reject) => {
     myAxios({
       url: path,
       method: "get",
       params: query,
+      headers,
     })
       .then((res) => {
+        if (res.status == 403) {
+          // Re-login
+          refresh();
+          return;
+        }
         const data = (res.data as any).data;
         resolve(data);
       })
@@ -26,7 +37,8 @@ export function get<T>(path: string, query?: QueryParams): Promise<T> {
 export function getOrMock<T>(
   path: string,
   query?: QueryParams,
-  mock?: Mocker<T>
+  mock?: Mocker<T>,
+  headers?: Record<string, string>
 ): Promise<T> {
   return new Promise((resolve, reject) => {
     if (import.meta.env.DEV && MOCK) {
@@ -38,7 +50,7 @@ export function getOrMock<T>(
         }
       }, mock?.delay | 0);
     } else {
-      get<T>(path, query)
+      get<T>(path, query, headers)
         .then((res) => {
           resolve(res);
         })

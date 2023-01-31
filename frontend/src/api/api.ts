@@ -1,12 +1,22 @@
+import { checkPwd } from "../utils/useAuthorization";
 import { getOrMock } from "./basic";
 import { listPicturesOk, partitionsOk } from "./mocks";
 import { ListResponse, Resolve } from "./models";
 
-export function getPartitions() {
-  return getOrMock<Array<string>>("/partitions", null, { data: partitionsOk, delay: 500 });
+export function listPartitions() {
+  const pwd = checkPwd();
+  return getOrMock<Array<string>>(
+    "/partitions",
+    null,
+    { data: partitionsOk, delay: 300 },
+    {
+      Password: pwd,
+    }
+  );
 }
 
 export function listPictures(param: { current: number; partition: string }) {
+  const pwd = checkPwd();
   return getOrMock<ListResponse<Resolve>>(
     `/${param.partition}/list`,
     {
@@ -16,6 +26,23 @@ export function listPictures(param: { current: number; partition: string }) {
     {
       data: listPicturesOk(param.current),
       delay: 500,
+    },
+    {
+      Password: pwd,
+    }
+  );
+}
+
+export function auth(password: string) {
+  return getOrMock<boolean>(
+    "/auth",
+    null,
+    {
+      data: true,
+      delay: 1000,
+    },
+    {
+      Password: password,
     }
   );
 }

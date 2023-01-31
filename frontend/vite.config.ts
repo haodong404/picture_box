@@ -19,7 +19,7 @@ export default defineConfig({
   define: {
     FRONTEND_VERSION: JSON.stringify(process.env.npm_package_version),
     CORE_VERSION: JSON.stringify(cargo_toml.package.version),
-    MOCK: true,
+    MOCK: false,
   },
   server: {
     port: 3000,

@@ -6,7 +6,11 @@ export default function Button(
   return (
     <button
       {...props}
-      class={`rounded-lg px-4 py-2 border-none font-bold bg-blue-400 text-blue-50 tracking-wider text-base cursor-pointer hover:bg-blue-300 hover:text-light-50 transition ${props.class}`}
+      class={`rounded-lg select-none px-4 py-2 border-none font-bold tracking-wider text-base transition ${props.class}`}
+      classList={{
+        "bg-blue-400 hover:bg-blue-300 hover:text-light-50 cursor-pointer text-light-50/95": !props.disabled,
+        "bg-gray-200 cursor-not-allowed text-gray-400": props.disabled,
+      }}
     />
   );
 }

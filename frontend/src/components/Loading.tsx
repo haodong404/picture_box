@@ -3,11 +3,11 @@ export default function Loading(props: any) {
     <div {...props}>
       <div
         role="status"
-        class="absolute -translate-x-1/2 -translate-y-1/2 top-2/4 left-1/2"
+        class="absolute inline-flex items-center -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"
       >
         <svg
           aria-hidden="true"
-          class="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+          class="w-8 h-8 text-gray-200 text-center animate-spin dark:text-gray-500 fill-blue-500"
           viewBox="0 0 100 101"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"

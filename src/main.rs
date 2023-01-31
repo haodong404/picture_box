@@ -1,19 +1,21 @@
 extern crate core;
 
+use actix_embed::Embed;
+use actix_web::http::header::CONTENT_TYPE;
 use actix_web::web::Data;
-use actix_web::{middleware::Logger, web, App, HttpServer, HttpResponse};
+use actix_web::{middleware::Logger, web, App, HttpResponse, HttpServer};
 use clap::Parser;
 use env_logger::Env;
 use log::info;
 use picture_box::models::{Args, Config, Context};
-use picture_box::services::{delete_picture, get_picture, list_pictures, upload_picture, list_partitions};
+use picture_box::services::{
+    delete_picture, get_picture, list_partitions, list_pictures, upload_picture, auth,
+};
 use picture_box::storage::{Cos, Local, Storage};
+use rust_embed::RustEmbed;
 use std::fs::File;
 use std::io::{BufReader, Result};
 use std::sync::{Arc, Mutex};
-use actix_embed::Embed;
-use actix_web::http::header::CONTENT_TYPE;
-use rust_embed::RustEmbed;
 
 #[derive(RustEmbed)]
 #[folder = "./frontend/dist"]
@@ -64,7 +66,8 @@ async fn main() -> Result<()> {
                     .service(get_picture)
                     .service(delete_picture)
                     .service(list_pictures)
-                    .service(list_partitions),
+                    .service(list_partitions)
+                    .service(auth),
             )
             .service(
                 Embed::new("/{tail:.*}", &Assets)
@@ -78,7 +81,7 @@ async fn main() -> Result<()> {
                     }),
             )
     })
-        .bind((config.bind.as_str(), config.port))?
-        .run()
-        .await
+    .bind((config.bind.as_str(), config.port))?
+    .run()
+    .await
 }

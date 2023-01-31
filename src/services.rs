@@ -222,3 +222,11 @@ pub async fn list_partitions(
     let result: Vec<&String> = data.config.partitions.keys().collect();
     response_ok_data(result)
 }
+
+#[get("/auth")]
+pub async fn auth(data: web::Data<Context>, header: Header<PasswordHeader>) -> HttpResponse {
+    if let Err(_) = authorization(&header, data.config) {
+        return response_err_403();
+    }
+    response_ok_data(true)
+}
