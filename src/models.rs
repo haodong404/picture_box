@@ -61,7 +61,7 @@ pub struct Context {
 }
 
 #[derive(Deserialize)]
-pub struct Resolve {
+pub struct Scheme {
     pub(crate) width: Option<u32>,
     pub(crate) height: Option<u32>,
     pub(crate) lossy: Option<bool>,
@@ -100,7 +100,8 @@ pub struct Partition {
     pub(crate) enable: bool,
     pub(crate) lossy: Option<bool>,
     pub(crate) quality: Option<f32>,
-    pub(crate) resolves: HashMap<String, Resolve>,
+    pub(crate) schemes: HashMap<String, Scheme>,
+    pub(crate) thumbnail: Option<String>,
 }
 
 #[derive(Debug)]
@@ -113,7 +114,7 @@ pub struct Output {
 
 #[derive(Debug)]
 pub enum TargetFile {
-    Resolved(WebPMemory),
+    Processed(WebPMemory),
     Original(Arc<Bytes>),
 }
 
@@ -125,7 +126,7 @@ impl TargetFile {
 
 #[derive(Debug)]
 pub struct Target {
-    pub resolve: String,
+    pub name: String,
     pub file: TargetFile,
 }
 
@@ -168,8 +169,7 @@ pub struct Failure {
 
 #[derive(Serialize, Deserialize)]
 pub struct Picture {
-    id: String,
-    url: String,
+    pub url: String,
 }
 
 #[derive(Clone, Debug)]

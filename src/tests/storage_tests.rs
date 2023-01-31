@@ -4,7 +4,7 @@ use std::io::{BufReader, Read};
 use std::sync::Arc;
 use bytes::Bytes;
 use crate::models::{ImageFormat, Output, Target};
-use crate::models::TargetFile::{Original, Resolved};
+use crate::models::TargetFile::{Original, Processed};
 use crate::storage::{Local, Storage};
 use crate::tests::common::config;
 
@@ -26,7 +26,7 @@ fn can_store_original_jpeg_pics() {
     let mut bytes: Vec<u8> = vec![];
     buffer.read_to_end(&mut bytes).unwrap();
     let bytes = Arc::new(Bytes::from(bytes));
-    let resolve = String::from("small");
+    let scheme = String::from("small");
     let partition = String::from("default");
     let hash = String::from("can_remove_the_last_slash_of_base_url");
     let output = Output {
@@ -34,15 +34,15 @@ fn can_store_original_jpeg_pics() {
         hash: hash.clone(),
         original_format: ImageFormat::try_from(image::ImageFormat::Jpeg).unwrap(),
         targets: vec![Target {
-            resolve: resolve.clone(),
+            name: scheme.clone(),
             file: Original(bytes),
         }],
     };
 
     let result = storage.store(output).unwrap();
-    assert_eq!(1, result.len());
-    assert!(result.contains_key(&resolve));
-    assert_eq!(Some(&format!("{}/api/pictures/{}/{}/{}", config.base_url, partition, resolve, hash)), result.get(&resolve));
+    assert_eq!(1, result.pictures.len());
+    assert!(result.pictures.contains_key(&scheme));
+    assert_eq!(Some(&format!("{}/api/pictures/{}/{}/{}", config.base_url, partition, scheme, hash)), result.pictures.get(&scheme));
 }
 
 #[test]
@@ -54,7 +54,7 @@ fn can_store_original_png_pics() {
     let mut bytes: Vec<u8> = vec![];
     buffer.read_to_end(&mut bytes).unwrap();
     let bytes = Arc::new(Bytes::from(bytes));
-    let resolve = String::from("small");
+    let scheme = String::from("small");
     let partition = String::from("default");
     let hash = String::from("can_remove_the_last_slash_of_base_url");
     let output = Output {
@@ -62,14 +62,14 @@ fn can_store_original_png_pics() {
         hash: hash.clone(),
         original_format: ImageFormat::try_from(image::ImageFormat::Png).unwrap(),
         targets: vec![Target {
-            resolve: resolve.clone(),
+            name: scheme.clone(),
             file: Original(bytes),
         }],
     };
     let result = storage.store(output).unwrap();
-    assert_eq!(1, result.len());
-    assert!(result.contains_key(&resolve));
-    assert_eq!(Some(&format!("{}/api/pictures/{}/{}/{}", config.base_url, partition, resolve, hash)), result.get(&resolve));
+    assert_eq!(1, result.pictures.len());
+    assert!(result.pictures.contains_key(&scheme));
+    assert_eq!(Some(&format!("{}/api/pictures/{}/{}/{}", config.base_url, partition, scheme, hash)), result.pictures.get(&scheme));
 }
 
 #[test]
@@ -82,7 +82,7 @@ fn can_remove_the_last_slash_of_base_url() {
     let mut bytes: Vec<u8> = vec![];
     buffer.read_to_end(&mut bytes).unwrap();
     let bytes = Arc::new(Bytes::from(bytes));
-    let resolve = String::from("small");
+    let scheme = String::from("small");
     let partition = String::from("default");
     let hash = String::from("can_remove_the_last_slash_of_base_url");
     let output = Output {
@@ -90,19 +90,19 @@ fn can_remove_the_last_slash_of_base_url() {
         hash: hash.clone(),
         original_format: ImageFormat::try_from(image::ImageFormat::Png).unwrap(),
         targets: vec![Target {
-            resolve: resolve.clone(),
+            name: scheme.clone(),
             file: Original(bytes),
         }],
     };
 
     let result = storage.store(output).unwrap();
-    assert_eq!(1, result.len());
-    assert!(result.contains_key(&resolve));
-    assert_eq!(Some(&format!("{}api/pictures/{}/{}/{}", config.base_url, partition, resolve, hash)), result.get(&resolve));
+    assert_eq!(1, result.pictures.len());
+    assert!(result.pictures.contains_key(&scheme));
+    assert_eq!(Some(&format!("{}api/pictures/{}/{}/{}", config.base_url, partition, scheme, hash)), result.pictures.get(&scheme));
 }
 
 #[test]
-fn can_store_resolved_image() {
+fn can_store_schemed_image() {
     let mut storage = get_storage();
     let mut config = config();
     config.base_url = String::from("http://localhost:8080/");
@@ -111,9 +111,9 @@ fn can_store_resolved_image() {
     let mut bytes: Vec<u8> = vec![];
     buffer.read_to_end(&mut bytes).unwrap();
     let bytes = Arc::new(Bytes::from(bytes));
-    let resolve = String::from("middle");
+    let scheme = String::from("middle");
     let partition = String::from("default");
-    let hash = String::from("can_store_resolved_image");
+    let hash = String::from("can_store_schemed_image");
     let webp_image = webp::Decoder::new(&bytes);
     let webp_image = webp_image.decode().unwrap();
     let webp_image = webp_image.to_image();
@@ -123,15 +123,15 @@ fn can_store_resolved_image() {
         hash: hash.clone(),
         original_format: ImageFormat::try_from(image::ImageFormat::WebP).unwrap(),
         targets: vec![Target {
-            resolve: resolve.clone(),
-            file: Resolved(encoder.encode_lossless()),
+            name: scheme.clone(),
+            file: Processed(encoder.encode_lossless()),
         }],
     };
 
     let result = storage.store(output).unwrap();
-    assert_eq!(1, result.len());
-    assert!(result.contains_key(&resolve));
-    assert_eq!(Some(&format!("{}api/pictures/{}/{}/{}", config.base_url, partition, resolve, hash)), result.get(&resolve));
+    assert_eq!(1, result.pictures.len());
+    assert!(result.pictures.contains_key(&scheme));
+    assert_eq!(Some(&format!("{}api/pictures/{}/{}/{}", config.base_url, partition, scheme, hash)), result.pictures.get(&scheme));
 }
 
 #[test]
@@ -150,7 +150,7 @@ fn can_store_more_than_two_pictures() {
     buffer.read_to_end(&mut bytes_origin).unwrap();
 
     let bytes = Arc::new(Bytes::from(bytes));
-    let resolve = String::from("middle");
+    let scheme = String::from("middle");
     let partition = String::from("default");
     let hash = String::from("can_store_more_than_two_pictures");
     let webp_image = webp::Decoder::new(&bytes);
@@ -162,22 +162,22 @@ fn can_store_more_than_two_pictures() {
         hash: hash.clone(),
         original_format: ImageFormat::try_from(image::ImageFormat::WebP).unwrap(),
         targets: vec![Target {
-            resolve: resolve.clone(),
-            file: Resolved(encoder.encode_lossless()),
+            name: scheme.clone(),
+            file: Processed(encoder.encode_lossless()),
         }, Target {
-            resolve: String::from("origin"),
+            name: String::from("origin"),
             file: Original(Arc::new(Bytes::from(bytes_origin))),
         }],
     };
 
     let result = storage.store(output).unwrap();
-    assert_eq!(2, result.len());
-    assert!(result.contains_key(&resolve));
-    assert!(result.contains_key("origin"));
+    assert_eq!(2, result.pictures.len());
+    assert!(result.pictures.contains_key(&scheme));
+    assert!(result.pictures.contains_key("origin"));
     assert_eq!(
-        Some(&format!("{}api/pictures/{}/{}/{}", &config.base_url, partition, resolve, hash)
-        ), result.get(&resolve));
+        Some(&format!("{}api/pictures/{}/{}/{}", &config.base_url, partition, scheme, hash)
+        ), result.pictures.get(&scheme));
     assert_eq!(
         Some(&format!("{}api/pictures/{}/{}/{}", config.base_url, partition, "origin", hash)
-        ), result.get("origin"));
+        ), result.pictures.get("origin"));
 }

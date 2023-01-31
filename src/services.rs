@@ -120,12 +120,12 @@ pub async fn upload_picture(
 }
 
 /// Find a picture.
-#[get("/{partition}/{resolve}/{id}")]
+#[get("/{partition}/{scheme}/{id}")]
 pub async fn get_picture(
     path: web::Path<(String, String, String)>,
     data: web::Data<Context>,
 ) -> HttpResponse {
-    let (partition_str, resolve, id) = path.into_inner();
+    let (partition_str, scheme, id) = path.into_inner();
     let data = data.into_inner();
     let config = data.config;
     let storage = data.storage.lock();
@@ -137,7 +137,7 @@ pub async fn get_picture(
     if partition.is_none() {
         return response_err_404_empty();
     }
-    let result = storage.find(&partition_str, &id, &resolve);
+    let result = storage.get_picture(&partition_str, &id, &scheme);
     match result {
         Ok(result) => {
             let (bytes, mime) = result;

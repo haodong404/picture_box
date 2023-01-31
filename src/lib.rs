@@ -8,7 +8,7 @@ use bytes::Bytes;
 use image::imageops::FilterType::Triangle;
 use log::{error, info};
 
-use crate::models::{Output, Partition, Resolve, Target, TargetFile, UploadInfo, ImageFormat};
+use crate::models::{Output, Partition, Scheme, Target, TargetFile, UploadInfo, ImageFormat};
 
 pub mod models;
 pub mod services;
@@ -20,7 +20,7 @@ mod tests;
 
 const ORIGIN_TEXT: &str = "origin";
 
-fn exec(file_bytes: Arc<Bytes>, image_format: ImageFormat, output: Sender<Target>, key: String, cfg: Resolve) -> Result<(), Box<dyn Error>> {
+fn exec(file_bytes: Arc<Bytes>, image_format: ImageFormat, output: Sender<Target>, key: String, cfg: Scheme) -> Result<(), Box<dyn Error>> {
     info!("RESOLVING: [{key}]");
     let file_reader = Cursor::new(&*file_bytes);
     let mut image = image::load(file_reader, image_format.image_format)?;
@@ -40,8 +40,8 @@ fn exec(file_bytes: Arc<Bytes>, image_format: ImageFormat, output: Sender<Target
     };
     info!("DONE: [{key}]");
     output.send(Target {
-        resolve: key,
-        file: TargetFile::Resolved(encoded),
+        name: key,
+        file: TargetFile::Processed(encoded),
     })?;
     Ok(())
 }
@@ -56,7 +56,7 @@ pub fn compress(info: UploadInfo, config: &Partition) -> Result<Output, Box<dyn 
     };
 
     output.targets.push(Target {
-        resolve: String::from(ORIGIN_TEXT),
+        name: String::from(ORIGIN_TEXT),
         file: TargetFile::Original(Arc::clone(&file_bytes)),
     });
     if !config.enable {
@@ -65,9 +65,9 @@ pub fn compress(info: UploadInfo, config: &Partition) -> Result<Output, Box<dyn 
     let mut handlers = vec![];
     let (tx, rx) = mpsc::channel();
     let err: Arc<Mutex<Option<String>>> = Arc::new(Mutex::new(None));
-    for item in config.resolves.iter() {
+    for item in config.schemes.iter() {
         let tx_clone = tx.clone();
-        let val = Resolve {
+        let val = Scheme {
             lossy: if item.1.lossy.is_some() {
                 item.1.lossy
             } else {

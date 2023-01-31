@@ -2,6 +2,7 @@ import { A } from "@solidjs/router";
 import { createSignal, For, lazy, onMount } from "solid-js";
 import Viewer from "viewerjs";
 import "viewerjs/dist/viewer.css";
+import { Scheme } from "../api/models";
 
 function ResolveItem(props: any) {
   return (
@@ -20,14 +21,14 @@ function ResolveItem(props: any) {
   );
 }
 
-export default function PictureCard(props: any) {
+export default function PictureCard(props: { scheme: Scheme }) {
   let image;
   const [viewer, setViewer] = createSignal<Viewer>();
   onMount(() => {
     setViewer(
       new Viewer(image, {
         url() {
-          return props.resolves["origin"];
+          return props.scheme.pictures["origin"];
         },
       })
     );
@@ -43,12 +44,12 @@ export default function PictureCard(props: any) {
         <img
           class="w-full h-full object-cover overflow-hidden rounded-t-md"
           ref={image}
-          src={props.resolves["s"]}
+          src={props.scheme.pictures[props.scheme.thumbnail]}
           alt="Origin"
         />
       </section>
       <section class="p-4 flex gap-2 flex-wrap">
-        <For each={Object.entries(props.resolves)}>
+        <For each={Object.entries(props.scheme.pictures)}>
           {([key, value], index) => (
             <ResolveItem resolve={key} url={value} index={index} />
           )}
