@@ -60,7 +60,7 @@ export default function Login() {
                 name="password"
                 autocomplete="on"
                 required
-                class="absolute top-0 right-0 left-0 right-0"
+                class="absolute top-0 left-0 bottom-0 right-0"
                 value={pwdInput()}
                 onChange={(e) => {
                   setPwdInput(e.currentTarget.value);

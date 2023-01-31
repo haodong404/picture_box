@@ -29,10 +29,8 @@ export default function Partitions() {
       }}
     >
       <Card>
-        <h1 class="text-xl font-bold mt-0 text-center text-blue-900">
-          Partitions
-        </h1>
-        <ul class="relative p-0 list-none">
+        <h1 class="text-xl font-bold mt-0 text-blue-900">Partitions</h1>
+        <ul class="relative p-0">
           <Suspense fallback={<Loading />}>
             <For each={partitions()}>{(item) => <Item title={item} />}</For>
           </Suspense>

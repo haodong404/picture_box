@@ -10,8 +10,7 @@
       "enable": true,
       "lossy": true,
       "quality": 80.0,
-      "thumbnail": "xs",
-      "schemes": {
+      "resolves": {
         "xs": {
           "width": 50,
           "height": 50,

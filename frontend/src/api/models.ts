@@ -2,11 +2,7 @@ export interface QueryParams {
   [key: string]: string | number | undefined;
 }
 
-export interface Scheme {
-  id: string,
-  thumbnail: string | null,
-  pictures: Record<string, string>;
-}
+export type Resolve = Record<string, string>;
 
 export interface SuccessResponse<T> {
   code: number;

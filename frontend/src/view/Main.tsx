@@ -2,9 +2,11 @@ import { useNavigate, useParams } from "@solidjs/router";
 import {
   createEffect,
   createResource,
+  createSignal,
   ErrorBoundary,
   For,
   Suspense,
+  untrack,
 } from "solid-js";
 import { createStore, SetStoreFunction } from "solid-js/store";
 import { listPartitions, listPictures } from "../api/api";
@@ -72,7 +74,7 @@ export default function Main() {
           <section class="mt-4 min-h-96">
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 ">
               <For each={pictures()?.list}>
-                {(item) => <PictureCard scheme={item} />}
+                {(item) => <PictureCard resolves={item} />}
               </For>
             </div>
           </section>

@@ -2,6 +2,47 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2023-01-31
+
+### Bug Fixes
+
+- Cannot create directories that does not exist.
+- Change the default hostname
+- Fixed the problem that the 'current' field does not start from 1.
+- Wrong color of "Next Page" button when there is only one page.
+- Delete origin field in config.json
+- Style issues
+
+### Documentation
+
+- Add status badge
+- Add supported image formats
+- Add API definitions.
+- Add a new api definition, remove the 'origin' field.
+- Add API definition.
+
+### Features
+
+- Support custom hostname and port
+- Initial front end.
+- Add list partitions API
+- Mount frontend to actix server
+- Implement header
+- Update gitignore file in frontend, and dist is included now.
+- Implemented the presentation of images
+- Implemented the pagination
+- Add authorization for some sensitive APIs.
+- Add login card
+- Finished
+
+### Ci
+
+- Add regular ci action
+
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
 ## [0.1.0] - 2023-01-22
 
 ### Bug Fixes

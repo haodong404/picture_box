@@ -37,14 +37,13 @@ When you upload an image file, the application will process it according to your
 
 All the following apis are **prefixed with** `/api/picture`.
 
-| URL                       | Method | Request                                                                     | Note                                                   | Example              |
-| ------------------------- | ------ | --------------------------------------------------------------------------- | ------------------------------------------------------ | -------------------- |
-| `/:partition/upload`      | POST   | `multipart/form-data`<br/>file: File,<br/>[name: string]<br/>[hash: string] | Upload an image file.                                  | /default/upload      |
-| `/:partition/:scheme/:id` | GET    | None                                                                        | Find an image file.                                    | /default/xs/hashcode |
-| `/:partition/:id`         | DELETE | None                                                                        | Delete all images in a scheme.                         | /default/hashcode    |
-| `/:partition/list`        | GET    | A password header.<br/>`Password: <password>`                               | List all images in a partition                         | /default/list        |
-| `/partitions`             | GET    | A password header.<br/>`Password: <password>`                               | List all partitions, it depends on your configuration. |                      |
-| `/auth`                   | GET    | A password header.<br/>`Password: <password>`                               | Verify the password                                    |                      |
+| URL                        | Method | Note                                                   | Example              |
+| -------------------------- | ------ | ------------------------------------------------------ | -------------------- |
+| `/:partition/upload`       | POST   | Upload an image file.                                  | /default/upload      |
+| `/:partition/:resolve/:id` | GET    | Find an image file.                                    | /default/xs/hashcode |
+| `/:partition/:id`          | DELETE | Delete all images in a resolve.                        | /default/hashcode    |
+| `/:partition/list`         | GET    | List all images in a partition                         | /default/list        |
+| `/partitions`              | GET    | List all partitions, it depends on your configuration. |                      |
 
 ## Configure
 
@@ -56,9 +55,9 @@ interface Local {
     dir: string
 }
 
-// A processing scheme.
-// Each scheme is a image, and it will be converted to a webp.
-interface Scheme {
+// A processing resolve.
+// Each resolve is a image, and it will be converted to a webp.
+interface Resolve {
     // width
     widht: number | undefined,
     // height
@@ -76,16 +75,13 @@ interface Partition {
     enable: boolean,
     // Does it need lossy compression. It has a lower priority.
     // It would be overrided by Resolve.lossy.
-    lossy: boolean,
-    // Which picture in a scheme should be the Frontend thumbnail.
-    // It must be one of the value in a Scheme.
-    thumbnail: string, // Optional, 
+    lossy: boolean
     // Quality of webp file. available if lossy is true. It has a lower priority.
     // It would be overrided by Resolve.lossy.
     quality: number | undefined, // Default: 80.0, range: (0, 100)
-    // You can create many schemes, but more schemes mean more processing time. 
-    // Key: scheme name
-    schemes: Record<string, Scheme>,
+    // You can create many resolves, but more resolves mean more processing time. 
+    // Key: resolve name
+    resolves: Record<string, Resolve>,
 }
 
 interface Config {

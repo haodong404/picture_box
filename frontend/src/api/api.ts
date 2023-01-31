@@ -1,7 +1,7 @@
 import { checkPwd } from "../utils/useAuthorization";
 import { getOrMock } from "./basic";
 import { listPicturesOk, partitionsOk } from "./mocks";
-import { ListResponse, Scheme } from "./models";
+import { ListResponse, Resolve } from "./models";
 
 export function listPartitions() {
   const pwd = checkPwd();
@@ -17,7 +17,7 @@ export function listPartitions() {
 
 export function listPictures(param: { current: number; partition: string }) {
   const pwd = checkPwd();
-  return getOrMock<ListResponse<Scheme>>(
+  return getOrMock<ListResponse<Resolve>>(
     `/${param.partition}/list`,
     {
       current: param.current,
