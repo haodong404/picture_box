@@ -3,7 +3,7 @@
   "local": {
     "dir": "./.gen"
   },
-  "base_url": "http://localhost:8080",
+  "base_url": "http://localhost:7709",
   "password": "12345",
   "partitions": {
     "default": {

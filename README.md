@@ -35,7 +35,7 @@ When you upload an image file, the application will process it according to your
 
 ## API
 
-All the following apis are **prefixed with** `/api/picture`.
+All the following apis are **prefixed with** `/api/pictures`.
 
 | URL                       | Method | Request                                                                     | Note                                                   | Example              |
 | ------------------------- | ------ | --------------------------------------------------------------------------- | ------------------------------------------------------ | -------------------- |

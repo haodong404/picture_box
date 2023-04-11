@@ -20,7 +20,7 @@ fn default_hostname() -> String {
 }
 
 fn default_port() -> u16 {
-    8080
+    7709
 }
 
 /// To process an image.
