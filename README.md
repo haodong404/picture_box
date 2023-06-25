@@ -87,11 +87,13 @@ interface Partition {
 }
 interface Config {
     // Bind hostname
-    bind: String | undefined, // Default: 8080
+    bind: String | undefined,  // Default: localhost
     // Port
-    port: number | undefined, // Default: localhost
+    port: number | undefined, // Default: 8080
     // Where you wanna store.
     storage: string,
+    // CORS
+    cors: boolean,
     // local config.
     local: Local | undefined, // Required when storage is 'local'.
     // When you uploaded a image, base_url is a prefix of the generated link.
