@@ -1,12 +1,35 @@
 {
   "storage": "local",
+  "port": 8080,
   "local": {
     "dir": "./.gen"
   },
-  "base_url": "http://localhost:7709",
+  "base_url": "http://localhost:1420",
   "password": "12345",
+  "cors": true,
   "partitions": {
     "default": {
+      "enable": true,
+      "lossy": true,
+      "quality": 80.0,
+      "resolves": {
+        "xs": {
+          "width": 50,
+          "height": 50,
+          "lossy": false
+        },
+        "s": {
+          "width": 200,
+          "height": 200,
+          "quality": 50
+        },
+        "m": {
+          "width": 400,
+          "height": 400
+        }
+      }
+    },
+    "cover": {
       "enable": true,
       "lossy": true,
       "quality": 80.0,

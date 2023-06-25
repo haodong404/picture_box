@@ -1,5 +1,6 @@
 extern crate core;
 
+use actix_cors::Cors;
 use actix_embed::Embed;
 use actix_web::http::header::CONTENT_TYPE;
 use actix_web::web::Data;
@@ -9,7 +10,7 @@ use env_logger::Env;
 use log::info;
 use picture_box::models::{Args, Config, Context};
 use picture_box::services::{
-    delete_picture, get_picture, list_partitions, list_pictures, upload_picture, auth,
+    auth, delete_picture, get_picture, list_partitions, list_pictures, upload_picture,
 };
 use picture_box::storage::{Cos, Local, Storage};
 use rust_embed::RustEmbed;
@@ -57,9 +58,15 @@ async fn main() -> Result<()> {
 
     HttpServer::new(move || {
         let context = Arc::clone(&context);
+        let cors = Cors::default()
+            .allow_any_header()
+            .allow_any_method()
+            .allow_any_origin();
+
         App::new()
             .app_data(Data::from(context))
             .wrap(Logger::default())
+            .wrap(cors)
             .service(
                 web::scope("/api/pictures")
                     .service(upload_picture)

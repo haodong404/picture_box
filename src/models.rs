@@ -85,6 +85,8 @@ pub struct Config {
     #[serde(default = "default_base_url")]
     pub base_url: String,
 
+    pub cors: Option<bool>,
+
     pub password: Option<String>,
 
     pub partitions: HashMap<String, Partition>,
