@@ -4,7 +4,7 @@
   "local": {
     "dir": "./.gen"
   },
-  "base_url": "http://localhost:1420",
+  "base_url": "http://localhost:8080",
   "password": "12345",
   "cors": true,
   "partitions": {
