@@ -6,11 +6,12 @@ use std::fs;
 use std::fs::{create_dir_all, File, read_dir};
 use std::io::{BufReader, BufWriter, Read, Write};
 use log::info;
-use crate::models::{Config, ImageFormat, LocalConfig, Output, PageList, Pagination, TargetFile};
+use crate::models::{Config, ImageFormat, LocalConfig, Output, PageList, Pagination, TargetFile, Picture};
+use crate::utils::{get_size, get_resolve};
 
 /// Key: the resolve's name, for example: xs, s, m, origin.
 /// Value: The url of a resolve.
-type Pictures = HashMap<String, String>;
+type Pictures = HashMap<String, Picture>;
 
 pub trait Storage {
     /// Store the compressed output to a storage, an error will be returned if it fails.
@@ -110,7 +111,7 @@ impl Storage for Cos {
 }
 
 pub fn generate_url(base_url: &str, partition: &str, resolve: &str, hash: &str) -> String {
-    format!("{}/api/pictures/{}/{}/{}", base_url, partition, resolve, hash)
+    format!("{}/api/pictures/{}/{}/{}", base_url, partition, get_resolve(resolve), hash)
 }
 
 pub fn parse_resolve(file_name: &str) -> Option<(&str, &str)> {
@@ -145,11 +146,13 @@ impl Storage for Local {
             if base_url.ends_with('/') {
                 base_url.remove(base_url.len() - 1);
             }
-            pics.insert(target.resolve.clone(),
-                        generate_url(base_url.as_str(),
-                                     output.partition.as_str(),
-                                     target.resolve.as_str(),
-                                     output.hash.as_str()));
+
+            let (width, height) = get_size(&target.resolve);
+            pics.insert(String::from(get_resolve(&target.resolve)),
+                        Picture::create(generate_url(base_url.as_str(),
+                        output.partition.as_str(),
+                        target.resolve.as_str(),
+                        output.hash.as_str()), width, height));
             root_dir.pop();
         }
         let old = self.count.get(&output.partition).ok_or("Not found")?;
@@ -161,7 +164,7 @@ impl Storage for Local {
         let mut dir = self.root_dir.clone();
         dir.push(partition);
         dir.push(hash);
-        dir.push(&format!("{}.*", resolve));
+        dir.push(&format!("*{}.*", resolve));
         let pattern = dir.to_str().unwrap_or("");
         dir = glob::glob(pattern)?.next().ok_or("Not found")??;
         let extension = dir.extension().ok_or("")?.to_str().ok_or("Unknown extension.")?;
@@ -178,6 +181,7 @@ impl Storage for Local {
         let mut dir = self.root_dir.clone();
         dir.push(partition);
         dir.push(id);
+        
         let mut result = Pictures::new();
         let dir = read_dir(dir).ok()?;
         for res in dir {
@@ -185,8 +189,9 @@ impl Storage for Local {
             let file_name = entry.file_name();
             let file_name = file_name.to_str()?;
             let (resolve, _) = parse_resolve(file_name)?;
-            result.insert(resolve.to_string(),
-                          generate_url(&self.config.base_url, partition, resolve, id));
+            let (width, height) = get_size(file_name);
+            result.insert(String::from(get_resolve(&resolve.to_string())),
+                          Picture::create(generate_url(&self.config.base_url, partition, resolve, id), width, height));
         }
         Some(result)
     }
@@ -226,7 +231,8 @@ impl Storage for Local {
                     let file_name = item.file_name();
                     let file_name = file_name.to_str().unwrap_or("");
                     let (resolve, _) = parse_resolve(file_name).ok_or(format!("File name error: {}", file_name))?;
-                    pics.insert(resolve.to_string(), generate_url(&self.config.base_url, partition, resolve, id));
+                    let (width, height) = get_size(file_name);
+                    pics.insert(String::from(get_resolve(&resolve.to_string())), Picture::create(generate_url(&self.config.base_url, partition, resolve, id), width, height));
                 }
                 list.push(pics);
             } else {

@@ -3,12 +3,13 @@ use std::io::Cursor;
 use std::sync::{Arc, mpsc, Mutex};
 use std::sync::mpsc::Sender;
 use std::thread;
-use bytes::Bytes;
 
+use image::DynamicImage;
 use image::imageops::FilterType::Triangle;
 use log::{error, info};
 
-use crate::models::{Output, Partition, Resolve, Target, TargetFile, UploadInfo, ImageFormat};
+use crate::models::{Output, Partition, Resolve, Target, TargetFile, UploadInfo};
+use crate::utils::attach_size;
 
 pub mod models;
 pub mod services;
@@ -20,13 +21,21 @@ mod tests;
 
 const ORIGIN_TEXT: &str = "origin";
 
-fn exec(file_bytes: Arc<Bytes>, image_format: ImageFormat, output: Sender<Target>, key: String, cfg: Resolve) -> Result<(), Box<dyn Error>> {
+fn exec(image: &DynamicImage, output: Sender<Target>, key: String, cfg: Resolve) -> Result<(), Box<dyn Error>> {
     info!("RESOLVING: [{key}]");
-    let file_reader = Cursor::new(&*file_bytes);
-    let mut image = image::load(file_reader, image_format.image_format)?;
+    let mut resized_image = Option::None;
     if cfg.width.is_some() && cfg.height.is_some() {
-        image = image.resize(cfg.width.unwrap(), cfg.width.unwrap(), Triangle);
+        resized_image = Some(image.resize(cfg.width.unwrap(), cfg.width.unwrap(), Triangle));
     }
+
+    let image = if let Some(ok) = &resized_image {
+        ok
+    } else {
+        image
+    };
+
+    let key = attach_size(&key, &image);
+
     let encoder = webp::Encoder::from_image(&image)?;
     let encoded = match cfg.lossy {
         Some(flag) => {
@@ -39,6 +48,7 @@ fn exec(file_bytes: Arc<Bytes>, image_format: ImageFormat, output: Sender<Target
         None => encoder.encode_lossless(),
     };
     info!("DONE: [{key}]");
+    
     output.send(Target {
         resolve: key,
         file: TargetFile::Resolved(encoded),
@@ -55,8 +65,14 @@ pub fn compress(info: UploadInfo, config: &Partition) -> Result<Output, Box<dyn 
         targets: vec![],
     };
 
+    let format = &output.original_format;
+
+    let file_reader = Cursor::new(&*file_bytes);
+
+    let original_image: DynamicImage = image::load(file_reader, format.image_format)?;
+
     output.targets.push(Target {
-        resolve: String::from(ORIGIN_TEXT),
+        resolve: attach_size(ORIGIN_TEXT, &original_image),
         file: TargetFile::Original(Arc::clone(&file_bytes)),
     });
     if !config.enable {
@@ -65,6 +81,8 @@ pub fn compress(info: UploadInfo, config: &Partition) -> Result<Output, Box<dyn 
     let mut handlers = vec![];
     let (tx, rx) = mpsc::channel();
     let err: Arc<Mutex<Option<String>>> = Arc::new(Mutex::new(None));
+
+    let image_arc = Arc::new(original_image);
     for item in config.resolves.iter() {
         let tx_clone = tx.clone();
         let val = Resolve {
@@ -82,12 +100,11 @@ pub fn compress(info: UploadInfo, config: &Partition) -> Result<Output, Box<dyn 
             height: item.1.height,
         };
         let key = item.0.clone();
-        let chunk = Arc::clone(&file_bytes);
-        let format = output.original_format.clone();
+        let image = Arc::clone(&image_arc);
         let err = Arc::clone(&err);
         let handle = thread::spawn(move || {
-            exec(chunk, format, tx_clone, key, val).unwrap_or_else(|e| {
-                let mut err = err.lock().unwrap();
+            exec(&image, tx_clone, key, val).unwrap_or_else(|e| {
+                let mut err: std::sync::MutexGuard<'_, Option<String>> = err.lock().unwrap();
                 *err = Some(format!("{e:?}"));
                 error!("{:?}", e);
             });

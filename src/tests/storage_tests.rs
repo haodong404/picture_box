@@ -42,7 +42,7 @@ fn can_store_original_jpeg_pics() {
     let result = storage.store(output).unwrap();
     assert_eq!(1, result.len());
     assert!(result.contains_key(&resolve));
-    assert_eq!(Some(&format!("{}/api/pictures/{}/{}/{}", config.base_url, partition, resolve, hash)), result.get(&resolve));
+    assert_eq!(format!("{}/api/pictures/{}/{}/{}", config.base_url, partition, resolve, hash), result.get(&resolve).unwrap().url);
 }
 
 #[test]
@@ -69,14 +69,14 @@ fn can_store_original_png_pics() {
     let result = storage.store(output).unwrap();
     assert_eq!(1, result.len());
     assert!(result.contains_key(&resolve));
-    assert_eq!(Some(&format!("{}/api/pictures/{}/{}/{}", config.base_url, partition, resolve, hash)), result.get(&resolve));
+    assert_eq!(format!("{}/api/pictures/{}/{}/{}", config.base_url, partition, resolve, hash), result.get(&resolve).unwrap().url);
 }
 
 #[test]
 fn can_remove_the_last_slash_of_base_url() {
     let mut storage = get_storage();
     let mut config = config();
-    config.base_url = String::from("http://localhost:8080/");
+    config.base_url = String::from("http://localhost:7709/");
     let file = File::open("./resources/test.png").unwrap();
     let mut buffer = BufReader::new(file);
     let mut bytes: Vec<u8> = vec![];
@@ -98,14 +98,14 @@ fn can_remove_the_last_slash_of_base_url() {
     let result = storage.store(output).unwrap();
     assert_eq!(1, result.len());
     assert!(result.contains_key(&resolve));
-    assert_eq!(Some(&format!("{}api/pictures/{}/{}/{}", config.base_url, partition, resolve, hash)), result.get(&resolve));
+    assert_eq!(format!("{}api/pictures/{}/{}/{}", config.base_url, partition, resolve, hash), result.get(&resolve).unwrap().url);
 }
 
 #[test]
 fn can_store_resolved_image() {
     let mut storage = get_storage();
     let mut config = config();
-    config.base_url = String::from("http://localhost:8080/");
+    config.base_url = String::from("http://localhost:7709/");
     let file = File::open("./resources/m.webp").unwrap();
     let mut buffer = BufReader::new(file);
     let mut bytes: Vec<u8> = vec![];
@@ -131,14 +131,14 @@ fn can_store_resolved_image() {
     let result = storage.store(output).unwrap();
     assert_eq!(1, result.len());
     assert!(result.contains_key(&resolve));
-    assert_eq!(Some(&format!("{}api/pictures/{}/{}/{}", config.base_url, partition, resolve, hash)), result.get(&resolve));
+    assert_eq!(format!("{}api/pictures/{}/{}/{}", config.base_url, partition, resolve, hash), result.get(&resolve).unwrap().url);
 }
 
 #[test]
 fn can_store_more_than_two_pictures() {
     let mut storage = get_storage();
     let mut config = config();
-    config.base_url = String::from("http://localhost:8080/");
+    config.base_url = String::from("http://localhost:7709/");
     let file = File::open("./resources/m.webp").unwrap();
     let mut buffer = BufReader::new(file);
     let mut bytes: Vec<u8> = vec![];
@@ -174,10 +174,7 @@ fn can_store_more_than_two_pictures() {
     assert_eq!(2, result.len());
     assert!(result.contains_key(&resolve));
     assert!(result.contains_key("origin"));
-    assert_eq!(
-        Some(&format!("{}api/pictures/{}/{}/{}", &config.base_url, partition, resolve, hash)
-        ), result.get(&resolve));
-    assert_eq!(
-        Some(&format!("{}api/pictures/{}/{}/{}", config.base_url, partition, "origin", hash)
-        ), result.get("origin"));
+    assert_eq!(format!("{}api/pictures/{}/{}/{}", &config.base_url, partition, resolve, hash)
+        , result.get(&resolve).unwrap().url);
+    assert_eq!(format!("{}api/pictures/{}/{}/{}", config.base_url, partition, "origin", hash), result.get("origin").unwrap().url);
 }

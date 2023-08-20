@@ -66,7 +66,10 @@ export default function Main() {
   });
   return (
     <main class="container mx-auto px-4 xl:px-40">
-      <ErrorBoundary fallback={(e) => <Placeholder text={e.toString()} />}>
+      <ErrorBoundary fallback={(e) => {
+        console.error(e);
+        return <Placeholder text={e.toString()} />
+      }}>
         <Suspense fallback={<Loading />}>
           <section class="flex justify-end min-h-10">
             <PartitionSelector current={store.partition} setter={setStore} />

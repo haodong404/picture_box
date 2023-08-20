@@ -127,7 +127,7 @@ impl TargetFile {
 
 #[derive(Debug)]
 pub struct Target {
-    pub resolve: String,
+    pub resolve: String, // Size info is included, e.g. 3a-3a-origin
     pub file: TargetFile,
 }
 
@@ -169,9 +169,17 @@ pub struct Failure {
 }
 
 #[derive(Serialize, Deserialize)]
+#[derive(Debug)]
 pub struct Picture {
-    id: String,
-    url: String,
+    pub url: String,
+    pub width: u32,
+    pub height: u32,
+}
+
+impl Picture {
+    pub fn create(url: String, width: u32, height: u32) -> Picture {
+        Picture { url, width, height }
+    }
 }
 
 #[derive(Clone, Debug)]

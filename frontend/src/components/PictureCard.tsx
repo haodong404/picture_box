@@ -7,7 +7,7 @@ function ResolveItem(props: any) {
   return (
     <div class="px-2 pb-1 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
       <A
-        href={props.url}
+        href={props.url?.url}
         class="text-blue-900 text-xs font-bold inline-block"
         target="_blank"
         onClick={(event) => {
@@ -27,7 +27,7 @@ export default function PictureCard(props: any) {
     setViewer(
       new Viewer(image, {
         url() {
-          return props.resolves["origin"];
+          return props.resolves["origin"]?.url;
         },
       })
     );
@@ -43,7 +43,7 @@ export default function PictureCard(props: any) {
         <img
           class="w-full h-full object-cover overflow-hidden rounded-t-md"
           ref={image}
-          src={props.resolves["s"]}
+          src={props.resolves["m"]?.url}
           alt="Origin"
         />
       </section>
