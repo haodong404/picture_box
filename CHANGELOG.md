@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0] - 2023-08-20
+
+### Bug Fixes
+
+- Passing all tests
+
 ## [0.3.0] - 2023-06-25
 
 ### Bug Fixes
