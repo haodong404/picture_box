@@ -1,0 +1,11 @@
+version: '3'
+services:
+  picture-box:
+    container_name: picture-box
+    build: .
+    ports:
+      - 7709:7709
+    volumes:
+      - "/etc/picture_box:/etc/picture_box"
+      - "/opt/pictures:/app/pictures"
+    
