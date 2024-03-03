@@ -60,3 +60,34 @@ export function getOrMock<T>(
     }
   });
 }
+
+export function post<T>(
+  path: string,
+  query?: QueryParams,
+  data?: any,
+  timeout?: number,
+  headers?: Record<string, string>
+): Promise<T> {
+  return new Promise((resolve, reject) => {
+    myAxios({
+      url: path,
+      method: "post",
+      params: query,
+      data,
+      headers,
+      timeout,
+    })
+      .then((res) => {
+        if (res.status == 403) {
+          // Re-login
+          refresh();
+          return;
+        }
+        const data = (res.data as any).data;
+        resolve(data);
+      })
+      .catch((e) => {
+        reject(e);
+      });
+  });
+}

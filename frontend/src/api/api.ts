@@ -1,5 +1,5 @@
 import { checkPwd } from "../utils/useAuthorization";
-import { getOrMock } from "./basic";
+import { getOrMock, post } from "./basic";
 import { listPicturesOk, partitionsOk } from "./mocks";
 import { ListResponse, Resolve } from "./models";
 
@@ -45,4 +45,12 @@ export function auth(password: string) {
       Password: password,
     }
   );
+}
+
+export function upload(image: File, partition: string) {
+  const param = new FormData();
+  param.append("file", image, "new-image");
+  return post<Resolve>(`/${partition}/upload`, null, param, Number.MAX_VALUE, {
+    "Content-Type": "multipart/form-data",
+  });
 }

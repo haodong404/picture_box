@@ -5,15 +5,16 @@ import {
   createSignal,
   ErrorBoundary,
   For,
+  Show,
   Suspense,
-  untrack,
 } from "solid-js";
 import { createStore, SetStoreFunction } from "solid-js/store";
-import { listPartitions, listPictures } from "../api/api";
+import { listPartitions, listPictures, upload } from "../api/api";
 import Loading from "../components/Loading";
 import Pagination from "../components/Pagination";
 import PictureCard from "../components/PictureCard";
 import Placeholder from "../components/Placeholder";
+import Button from "../components/Button";
 
 const PartitionSelector = (props: {
   current: string;
@@ -24,7 +25,7 @@ const PartitionSelector = (props: {
 }) => {
   const [partitions] = createResource(listPartitions);
   return (
-    <div class="relative pt-4">
+    <div class="relative">
       <Suspense fallback={<Loading />}>
         <select
           onChange={(event) => {
@@ -50,6 +51,33 @@ focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
   );
 };
 
+const Uploader = (props: {partition: string}) => {
+  const [image, setImage] = createSignal<File>();
+  const fetcher = (file: File) => upload(file, props.partition);
+
+  const [data] = createResource(image, fetcher);
+
+  return <form class="flex items-start gap-4" onSubmit={async (event) => {
+    event.preventDefault();
+    const file = event.target["image"].files[0];
+    setImage(file);
+  }}>
+    <div class="flex flex-col items-start gap-4">
+      <input name="image" type="file" />
+      <Button type="submit" disabled={data.loading}>Upload</Button>
+    </div>
+
+    <Show when={data()}>
+    <div>
+      <h3>Success!</h3>
+      <ul>
+        <For each={Array.from(Object.entries(data()))}>{([key, value]) => <li>{key}: <a href={value["url"]}>{value["url"]}</a></li>}</For>
+      </ul>
+    </div>
+    </Show>
+  </form>
+}
+
 export default function Main() {
   const navigate = useNavigate();
   const param = useParams();
@@ -71,8 +99,17 @@ export default function Main() {
         return <Placeholder text={e.toString()} />
       }}>
         <Suspense fallback={<Loading />}>
-          <section class="flex justify-end min-h-10">
-            <PartitionSelector current={store.partition} setter={setStore} />
+          <section class="flex justify-between items-end min-h-10 gap-4 pt-4">
+            <div>
+              <ErrorBoundary fallback={(e) => <p>{`${e}`}</p>}>
+              <Suspense fallback={<Loading />}>
+                <Uploader partition={store.partition} />
+              </Suspense>
+              </ErrorBoundary>
+            </div>
+            <div>
+              <PartitionSelector current={store.partition} setter={setStore} />
+            </div>
           </section>
           <section class="mt-4 min-h-96">
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 ">

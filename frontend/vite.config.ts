@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 import solidPlugin from "vite-plugin-solid";
 import UnoCSS from "unocss/vite";
-import presetWind from "@unocss/preset-wind";
 import TOML from "@ltd/j-toml";
 import fs from "fs";
 
@@ -12,7 +11,7 @@ export default defineConfig({
   plugins: [
     solidPlugin(),
     UnoCSS({
-      presets: [presetWind()],
+      configFile: "./uno.config.ts"
     }),
   ],
   
@@ -24,7 +23,7 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
-      "/api/pictures": "http://localhost:8080",
+      "/api/pictures": "http://localhost:7709",
     },
   },
   build: {
