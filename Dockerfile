@@ -1,4 +1,5 @@
-FROM rust:slim as build
+FROM rust:alpine as build
+RUN apk add openssl-dev musl-dev
 WORKDIR /home
 COPY . .
 RUN cargo build --release
