@@ -8,6 +8,7 @@ use actix_web::{middleware::Logger, web, App, HttpResponse, HttpServer};
 use clap::Parser;
 use env_logger::Env;
 use log::info;
+use openssl::ssl::{SslAcceptor, SslAcceptorBuilder, SslFiletype, SslMethod};
 use picture_box::models::{Args, Config, Context};
 use picture_box::services::{
     auth, delete_picture, get_picture, list_partitions, list_pictures, upload_picture,
@@ -50,13 +51,21 @@ async fn main() -> Result<()> {
         }
     };
     let context = Arc::new(Context { config, storage });
-    info!(
-        "Server is running at: {}:{}",
-        config.bind.as_str(),
-        config.port
-    );
 
-    HttpServer::new(move || {
+    let mut builder = Option::None::<SslAcceptorBuilder>;
+
+    if config.ssl_certificate.is_some() && config.ssl_certificate_key.is_some() {
+        let mut builder_ = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
+        let ssl_certificate_key = config.ssl_certificate_key.as_ref().unwrap();
+        let chain_file = config.ssl_certificate.as_ref().unwrap();
+        builder_
+            .set_private_key_file(ssl_certificate_key, SslFiletype::PEM)
+            .unwrap();
+        builder_.set_certificate_chain_file(chain_file).unwrap();
+        builder = Some(builder_)
+    }
+
+    let mut server = HttpServer::new(move || {
         let context = Arc::clone(&context);
         let cors = Cors::default()
             .allow_any_header()
@@ -87,8 +96,24 @@ async fn main() -> Result<()> {
                             .body(index_data)
                     }),
             )
-    })
-    .bind((config.bind.as_str(), config.port))?
-    .run()
-    .await
+    });
+
+    info!(
+        "Server is running at: {}:{}",
+        config.bind.as_str(),
+        config.port
+    );
+
+    if let Some(ssl) = builder {
+        server = server.bind_openssl((config.bind.as_str(), config.port), ssl)?;
+        info!(
+            "SSL is enabled: {}, {}",
+            config.ssl_certificate.as_ref().unwrap(),
+            config.ssl_certificate_key.as_ref().unwrap()
+        )
+    } else {
+        server = server.bind((config.bind.as_str(), config.port))?;
+    }
+
+    server.run().await
 }

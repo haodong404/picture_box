@@ -6,6 +6,8 @@
   },
   "base_url": "http://localhost:7709",
   "password": "12345",
+  "ssl_certificate": "/Users/haodong/Downloads/admin.nekodastudio.com_nginx/admin.nekodastudio.com_bundle.crt",
+  "ssl_certificate_key": "/Users/haodong/Downloads/admin.nekodastudio.com_nginx/admin.nekodastudio.com.key",
   "cors": true,
   "partitions": {
     "default": {

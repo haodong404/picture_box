@@ -89,6 +89,10 @@ pub struct Config {
 
     pub password: Option<String>,
 
+    pub ssl_certificate: Option<String>,
+
+    pub ssl_certificate_key: Option<String>,
+
     pub partitions: HashMap<String, Partition>,
 }
 
@@ -168,8 +172,7 @@ pub struct Failure {
     pub error: String,
 }
 
-#[derive(Serialize, Deserialize)]
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Picture {
     pub url: String,
     pub width: u32,
