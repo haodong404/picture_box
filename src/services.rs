@@ -41,17 +41,19 @@ pub async fn upload_picture(
                 return response_err_400();
             }
             let chunk_checked = chunk.unwrap();
-            match field.name() {
-                "name" => {
-                    name_bytes.put(chunk_checked);
+            if let Some(name) = field.name() {
+                match name {
+                    "name" => {
+                        name_bytes.put(chunk_checked);
+                    }
+                    "file" => {
+                        file_bytes.put(chunk_checked);
+                    }
+                    "hash" => {
+                        hash_bytes.put(chunk_checked);
+                    }
+                    _ => {}
                 }
-                "file" => {
-                    file_bytes.put(chunk_checked);
-                }
-                "hash" => {
-                    hash_bytes.put(chunk_checked);
-                }
-                _ => {}
             }
         }
     }
