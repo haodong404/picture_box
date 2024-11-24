@@ -2,74 +2,94 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.0] - 2024-11-24
+
+### 🚀 Features
+
+- Add Dockerfile.
+- Add docker-compose.yml
+- Add uploading support
+- Ssl support
+
+### ⚙️ Miscellaneous Tasks
+
+- Update dependencies
+- Bump version
+
 ## [0.4.0] - 2023-08-20
 
-### Bug Fixes
+### 🐛 Bug Fixes
 
 - Passing all tests
+- Change version in Cargo.toml
+
+### ⚙️ Miscellaneous Tasks
+
+- Update ci
+- Update ubuntu target.
 
 ## [0.3.0] - 2023-06-25
 
-### Bug Fixes
-
-- /api/picture -> /api/pictures in README
-
-### Documentation
-
-- Re-commit
-
-### Features
+### 🚀 Features
 
 - Add CORS support
 
+### 🐛 Bug Fixes
+
+- /api/picture -> /api/pictures in README
+
+### 📚 Documentation
+
+- *(readme)* Re-commit
+
 ## [0.2.0] - 2023-01-31
 
-### Bug Fixes
+### 🚀 Features
+
+- Support custom hostname and port
+- *(frontend)* Initial front end.
+- Add list partitions API
+- Mount frontend to actix server
+- *(frontend)* Implement header
+- *(frontend)* Update gitignore file in frontend, and dist is included now.
+- *(frontend)* Implemented the presentation of images
+- *(frontend)* Implemented the pagination
+- *(core)* Add authorization for some sensitive APIs.
+- *(frontend)* Add login card
+- *(frontend)* Finished
+
+### 🐛 Bug Fixes
 
 - Cannot create directories that does not exist.
 - Change the default hostname
-- Fixed the problem that the 'current' field does not start from 1.
-- Wrong color of "Next Page" button when there is only one page.
-- Delete origin field in config.json
+- *(core)* Fixed the problem that the 'current' field does not start from 1.
+- *(frontend)* Wrong color of "Next Page" button when there is only one page.
+- *(core)* Delete origin field in config.json
 - Style issues
 
-### Documentation
+### 📚 Documentation
 
-- Add status badge
-- Add supported image formats
+- *(readme)* Add status badge
+- *(readme)* Add supported image formats
 - Add API definitions.
-- Add a new api definition, remove the 'origin' field.
-- Add API definition.
+- *(readme)* Add a new api definition, remove the 'origin' field.
+- *(readme)* Add API definition.
 
-### Features
-
-- Support custom hostname and port
-- Initial front end.
-- Add list partitions API
-- Mount frontend to actix server
-- Implement header
-- Update gitignore file in frontend, and dist is included now.
-- Implemented the presentation of images
-- Implemented the pagination
-- Add authorization for some sensitive APIs.
-- Add login card
-- Finished
-
-### Ci
+### ⚙️ Miscellaneous Tasks
 
 - Add regular ci action
 
 ## [0.1.0] - 2023-01-22
 
-### Bug Fixes
-
-- Compile error
-
-### Features
+### 🚀 Features
 
 - Create a license
 
-### Ci
+### 🐛 Bug Fixes
+
+- Compile error
+
+### ⚙️ Miscellaneous Tasks
 
 - Update title
 
